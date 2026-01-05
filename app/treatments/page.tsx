@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -30,7 +30,17 @@ const useIsMobile = () => {
   return isMobile;
 };
 
-export default function TreatmentsPage() {
+// Loading Fallback for Suspense
+function TreatmentsLoading() {
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="animate-pulse text-2xl text-ruby-primary">Loading...</div>
+    </div>
+  );
+}
+
+// Main Content Component (uses useSearchParams)
+function TreatmentsContent() {
   const isMobile = useIsMobile();
   const { language, t } = useLanguage();
   const services = getServices(language);
@@ -344,5 +354,14 @@ export default function TreatmentsPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// Default Export with Suspense Wrapper
+export default function TreatmentsPage() {
+  return (
+    <Suspense fallback={<TreatmentsLoading />}>
+      <TreatmentsContent />
+    </Suspense>
   );
 }
